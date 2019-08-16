@@ -3,6 +3,8 @@ from matplotlib.image import imread
 import matplotlib.pyplot as plt
 import numpy as np
 
+#TODO: Implementar outros métodos de interpolação: bilinear e bicúbica
+
 def interpolation_NearestNeighbour(original_img, newShape):
     original_shape = original_img.shape
     x_scale = newShape[0]/original_shape[0]
@@ -25,7 +27,10 @@ def NearestNeighbour(original_img, newShape):
 
 imagesTuples_path_newSize = [('n01_realce/images/zoom_in_1.png', [480, 360]),
                             ('n01_realce/images/zoom_in_2.png', [1456, 2597]),
-                            ('n01_realce/images/zoom_in_3.png', [990, 720])]
+                            ('n01_realce/images/zoom_in_3.png', [990, 720]),
+                            ('n01_realce/images/zoom_out_1.png', [120, 271]),
+                            ('n01_realce/images/zoom_out_2.png', [500, 317]),
+                            ('n01_realce/images/zoom_out_3.png', [500, 174])]
 
 for imageTuple in imagesTuples_path_newSize:
     print('=================')
