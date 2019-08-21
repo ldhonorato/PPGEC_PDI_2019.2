@@ -4,13 +4,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #TODO: Implementar outros métodos de interpolação: bicúbica
+def cubic_interpolation(p, x):
+    return p[1] + 0.5 * x*(p[2] - p[0] + x*(2.0*p[0] - 5.0*p[1] + 4.0*p[2] - p[3] + x*(3.0*(p[1] - p[2]) + p[3] - p[0])))
 
 def interpolation_bicubic(original_img, newShape):
     original_shape = original_img.shape
     x_scale = original_shape[1]/newShape[1]
     y_scale = original_shape[0]/newShape[0]
     newImage = np.zeros(newShape)
-    
+    #for i_x in range(newShape[1]):
+    #    for i_y in range(newShape[0]):
+            
     return newImage
 
 def interpolation_bilinear(original_img, newShape):
