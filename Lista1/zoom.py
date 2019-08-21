@@ -3,64 +3,51 @@ from matplotlib.image import imread, imsave
 import matplotlib.pyplot as plt
 import numpy as np
 
-#TODO: Implementar outros métodos de interpolação: bilinear e bicúbica
+#TODO: Implementar outros métodos de interpolação: bicúbica
 
-def calc_bilinear_interpolation(img, posX, posY):
-    #Get integer and fractional parts of numbers
-    modXi = int(posX)
-    modYi = int(posY)
-    modXf = posX - modXi
-    modYf = posY - modYi
-    modXiPlusOneLim = min(modXi+1,img.shape[0]-1)
-    modYiPlusOneLim = min(modYi+1,img.shape[1]-1)
-
-    #Get pixels in four corners
-    bl = img[modYi, modXi]
-    br = img[modYi, modXiPlusOneLim]
-    tl = img[modYiPlusOneLim, modXi]
-    tr = img[modYiPlusOneLim, modXiPlusOneLim]
-
-    #Calculate interpolation
-    b = modXf * br + (1. - modXf) * bl
-    t = modXf * tr + (1. - modXf) * tl
-    pxf = modYf * t + (1. - modYf) * b
-    return int(pxf+0.5)
+def interpolation_bicubic(original_img, newShape):
+    original_shape = original_img.shape
+    x_scale = original_shape[1]/newShape[1]
+    y_scale = original_shape[0]/newShape[0]
+    newImage = np.zeros(newShape)
+    
+    return newImage
 
 def interpolation_bilinear(original_img, newShape):
     original_shape = original_img.shape
     x_scale = original_shape[1]/newShape[1]
     y_scale = original_shape[0]/newShape[0]
-    #newImage = np.zeros(newShape)
+    newImage = np.zeros(newShape)
 
-    x = np.arange(newShape[1])
-    y = np.arange(newShape[0])
+    for i_x in range(newShape[1]):
+        for i_y in range(newShape[0]):
+            #position in the original image
+            x = i_x * x_scale
+            y = i_y * y_scale
 
-    x = x * x_scale
-    y = y * y_scale
+            x1 = int(x)
+            y1 = int(y)
+            x2 = min(x1+1,original_img.shape[1]-1)
+            y2 = min(y1+1,original_img.shape[0]-1)
 
-    x0 = np.floor(x).astype(int)
-    x1 = x0 + 1
-    y0 = np.floor(y).astype(int)
-    y1 = y0 + 1
+            q11 = original_img[y1, x1]
+            q12 = original_img[y2, x1]
+            q21 = original_img[y1, x2]
+            q22 = original_img[y2, x2]
 
-    x0 = np.clip(x0, 0, original_shape[1]-1)
-    x1 = np.clip(x1, 0, original_shape[1]-1)
-    y0 = np.clip(y0, 0, original_shape[0]-1)
-    y1 = np.clip(y1, 0, original_shape[0]-1)
+            if x1 != x2: #to avoid zero division
+                r1 = q11*((x2-x)/(x2-x1)) + q21*((x-x1)/(x2-x1))
+                r2 = q12*((x2-x)/(x2-x1)) + q22*((x-x1)/(x2-x1))
+            else:
+                r1 = q12 #in fact q12 = q22 = r1 = r2
+                r2 = q22
 
-    Ia = original_img[ y0, x0 ]
-    Ib = original_img[ y1, x0 ]
-    Ic = original_img[ y0, x1 ]
-    Id = original_img[ y1, x1 ]
-
-    wa = (x1-x) * (y1-y)
-    wb = (x1-x) * (y-y0)
-    wc = (x-x0) * (y1-y)
-    wd = (x-x0) * (y-y0)
-
-    return wa*Ia + wb*Ib + wc*Ic + wd*Id
-
-    
+            if y1 != y2: #to avoid zero division
+                p = r1*((y2-y)/(y2-y1)) + r2*((y-y1)/(y2-y1))
+            else:
+                p = r1 #if y1 = y2 then r1 = r2
+            newImage[i_y, i_x] = p
+    return newImage
 
 
 def interpolation_NearestNeighbour(original_img, newShape):
@@ -100,11 +87,14 @@ def main():
         newShape = imageTuple[1] #target image size
         print('New size: ', newShape)
 
+        imageName = imgPath.split('/')[-1]
         insertIndex = imageName.find('.png')
         
         bilinearImage = interpolation_bilinear(img, newShape)
         plt.imshow(bilinearImage, cmap='gray')
         plt.show()
+        fileName = imageName[:insertIndex] + '_outputBilinearInterpolation.png'
+        imsave(fileName, bilinearImage, cmap='gray')
 
         #newImageWithoutInterpolation = NearestNeighbour(img, newShape)
         #fileName = imageName[:insertIndex] + '_outputWithoutInterpolation.png'
