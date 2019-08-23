@@ -173,12 +173,12 @@ def NearestNeighbour(original_img, newShape):
             newImage[int(x*x_scale), int(y*y_scale)] = original_img[x, y]
     return newImage
 
-imagesTuples_path_newSize = [('n01_realce/images/zoom_in_1.png', [480, 360]),
-                            ('n01_realce/images/zoom_in_2.png', [1456, 2597]),
-                            ('n01_realce/images/zoom_in_3.png', [990, 720]),
-                            ('n01_realce/images/zoom_out_1.png', [120, 271]),
-                            ('n01_realce/images/zoom_out_2.png', [500, 317]),
-                            ('n01_realce/images/zoom_out_3.png', [500, 174])]
+imagesTuples_path_newSize = [('images/zoom_in_1.png', [480, 360]),
+                            ('images/zoom_in_2.png', [1456, 2597]),
+                            ('images/zoom_in_3.png', [990, 720]),
+                            ('images/zoom_out_1.png', [120, 271]),
+                            ('images/zoom_out_2.png', [500, 317]),
+                            ('images/zoom_out_3.png', [500, 174])]
 
 def main():
     for imageTuple in imagesTuples_path_newSize:
