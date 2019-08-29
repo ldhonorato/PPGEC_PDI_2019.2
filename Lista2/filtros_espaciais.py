@@ -1,5 +1,6 @@
 import numpy as np
 import PIL.Image as pil
+import matplotlib.pyplot as plt
 
 
 def padding(img, padding_size, valor=0):  # caso queira uma borda com valor diferente
@@ -25,7 +26,7 @@ def conv(img, filter_kernel):
     assert kernel_shape[0] % 2 == 1  # o kernel tem dimensões impar
     assert kernel_shape[0] > 2  # kernel minimo 3x3
 
-    padding_size = kernel_shape[0]-2
+    padding_size = int(kernel_shape[0]//2)
     kernel_sum = np.sum(filter_kernel)
     padded_img, original_shape = padding(img, padding_size)
     newImg = np.zeros(original_shape)
@@ -82,3 +83,28 @@ def saveImgFromArray(imgArray, imgName):
     img = img.convert('L')
     img.save(imgName)
 
+
+def plotImages(images, nrows, ncols, title):
+    i = 1
+    fig = plt.figure()
+    fig.suptitle(title)
+    for img in images:
+        ax = fig.add_subplot(nrows, ncols, i)
+        plt.imshow(img[0], cmap='gray')
+        plt.title(img[1])
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        i += 1
+    
+    plt.show()
+
+def generateGaussianKernel(sigma):
+    gaussianKernel = np.zeros((3,3))
+    denominador = 2*sigma**2
+    for i in range(gaussianKernel.shape[0]):
+        for j in range(gaussianKernel.shape[1]):
+            x = i - 1
+            y = j - 1
+            gaussianKernel[j][i] = np.exp(-(x**2 + y**2)/denominador)
+    
+    return gaussianKernel

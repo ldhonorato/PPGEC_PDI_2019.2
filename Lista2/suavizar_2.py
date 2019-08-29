@@ -34,19 +34,11 @@ def main():
         gaussian3x3_img = filtros.conv(img, filtros.gaussian_kernel_3x3)
         filtros.saveImgFromArray(gaussian3x3_img, "suavizar_02_gaussian_3x3.png")
 
-    fig = plt.figure()
-    fig.add_subplot(2, 2, 1)
-    plt.imshow(img, cmap='gray', label='Imagem Original')
-    fig.add_subplot(2, 2, 2)
-    plt.imshow(mean_img, cmap='gray', label='Filtro média 3x3')
-    fig.add_subplot(2, 2, 3)
-    plt.imshow(median_img, cmap='gray', label='Filtro mediana 3x3')
-    fig.add_subplot(2, 2, 4)
-    plt.imshow(gaussian3x3_img, cmap='gray', label='Filtro gaussianp 3x3')
-    plt.show()
-
-    # mean_img = mean_img.convert("L")
-    # mean_img.save("suavizar_media3x3_01.png")
-
+    images = [(img, 'Imagem original'),
+              (mean_img, 'Filtro média 3x3'),
+              (median_img, 'Filtro mediana 3x3'),
+              (gaussian3x3_img, 'Filtro gaussianp 3x3')]
+    filtros.plotImages(images, 2, 2, 'Resultados Suavizar 02')
+  
 if __name__ == "__main__":
     main()

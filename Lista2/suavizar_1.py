@@ -6,6 +6,8 @@ import os
 
 path_img_suavizar01 = 'images/suavizar_01.png'
 
+
+
 def main():
     img = pil.open(path_img_suavizar01)
     img = np.array(img)
@@ -33,17 +35,21 @@ def main():
         print('Executando Filtro Gaussiano')
         gaussian3x3_img = filtros.conv(img, filtros.gaussian_kernel_3x3)
         filtros.saveImgFromArray(gaussian3x3_img, "suavizar_01_gaussian_3x3.png")
+    
+    if os.path.exists("suavizar_01_MedianaGaussiano_3x3.png"):
+        medianaGaussian3x3_img = pil.open("suavizar_01_MedianaGaussiano_3x3.png")
+        medianaGaussian3x3_img = np.array(medianaGaussian3x3_img)
+    else:
+        print('Executando Filtro Gaussiano')
+        medianaGaussian3x3_img = filtros.conv(median_img, filtros.generateGaussianKernel(1.8))
+        filtros.saveImgFromArray(medianaGaussian3x3_img, "suavizar_01_MedianaGaussiano_3x3.png")
 
-    fig = plt.figure()
-    fig.add_subplot(2, 2, 1)
-    plt.imshow(img, cmap='gray', label='Imagem Original')
-    fig.add_subplot(2, 2, 2)
-    plt.imshow(mean_img, cmap='gray', label='Filtro média 3x3')
-    fig.add_subplot(2, 2, 3)
-    plt.imshow(median_img, cmap='gray', label='Filtro mediana 3x3')
-    fig.add_subplot(2, 2, 4)
-    plt.imshow(gaussian3x3_img, cmap='gray', label='Filtro gaussianp 3x3')
-    plt.show()
+    images = [(img, 'Imagem original'),
+            (mean_img, 'Filtro média 3x3'),
+            (median_img, 'Filtro mediana 3x3'),
+            (gaussian3x3_img, 'Filtro gaussiano 3x3'),
+            (medianaGaussian3x3_img, 'Filtro Mediana -> gaussiano 3x3')]
+    filtros.plotImages(images, 3, 2, 'Resultados Suavizar 01')
 
     # mean_img = mean_img.convert("L")
     # mean_img.save("suavizar_media3x3_01.png")
