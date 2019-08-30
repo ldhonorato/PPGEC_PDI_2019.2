@@ -3,7 +3,7 @@ import PIL.Image as pil
 import matplotlib.pyplot as plt
 
 
-def padding(img, padding_size, valor=0):  # caso queira uma borda com valor diferente
+def padding(img, padding_size=1, valor=0):  # caso queira uma borda com valor diferente
     newImg = np.zeros((img.shape[0]+padding_size*2,
                       img.shape[1]+padding_size*2)) + valor
     i = (padding_size-1)
@@ -77,6 +77,76 @@ laplace_diagonal_kernel_3x3 = np.array([ [1,  1, 1],
                                          [1, -8, 1],
                                          [1,  1, 1]])
 
+g1 = np.array([[2, 4, 5, 4, 2],
+                 [4, 9, 26, 9, 4],
+                 [5, 12, 15, 12, 5],
+                 [4, 9, 26, 9, 4],
+                 [2, 4, 5, 4, 2]])/273
+    
+g2 = np.array([[1, 4, 7, 4, 1],
+                 [4, 16, 26, 16, 4],
+                 [7, 26, 41, 26, 7],
+                 [4, 16, 26, 16, 4],
+                 [1, 4, 7, 4, 1]])/273
+    
+g3 = np.array([[2, 4, 5, 4, 2],
+                 [4, 9, 12, 9, 4],
+                 [5, 12, 15, 12, 5],
+                 [4, 9, 12, 9, 4],
+                 [2, 4, 5, 4, 2]])/115
+
+def sobel(subImg):
+    gx = np.array([[-1, 0, 1],
+                   [-2, 0, 2],
+                   [-1, 0, 1]])
+    
+    gy = np.array([[1, 2, 1],
+                   [0, 0, 0],
+                   [-1, -2, -1]])
+    
+    resultado = ((np.sum(gx * subImg))**2 + (np.sum(gy * subImg))**2)**0.5
+    
+    return resultado
+
+def wiener(subImg):
+        
+    img_fft = np.fft.fft2(subImg)
+    
+    funcao_fft = np.fft.fft2(np.array([[1, 4, 7, 4, 1],
+                 [4, 16, 26, 16, 4],
+                 [7, 26, 41, 26, 7],
+                 [4, 16, 26, 16, 4],
+                 [1, 4, 7, 4, 1]])/273)
+    
+    resultado = img_fft*np.conjugate(funcao_fft)/(np.abs(funcao_fft) + 1)
+        
+    resultado = np.abs(np.fft.ifft2(resultado))
+    
+    return resultado[0][0]
+
+def fWiener(imagem):
+    img, origShape = padding(imagem)
+    newImg = np.zeros(origShape)
+          
+    for i  in range(img.shape[0] - 4):
+        for j in range(img.shape[1] - 4):
+            ni = i + 2
+            nj = j + 2
+            newImg[i, j] = wiener(img[ni-2:ni+3,nj-2:nj+3]) #sub matriz
+    
+    return newImg 
+
+def fSobel(imagem):
+    img, origShape = padding(imagem)
+    newImg = np.zeros(origShape)
+          
+    for i  in range(img.shape[0] - 2):
+        for j in range(img.shape[1] - 2):
+            ni = i + 1
+            nj = j + 1
+            newImg[i, j] = sobel(img[ni-1:ni+2,nj-1:nj+2]) #sub matriz
+    
+    return newImg
 
 def saveImgFromArray(imgArray, imgName):
     img = pil.fromarray(imgArray)
