@@ -382,60 +382,103 @@ def imagem05(path, nome):
 
 
 if __name__=="__main__":
-    # impulso_unipolar("images/image_01.png", 0.15, 0, "image_01_uni_15per.png")
-    # hist.carrega("images/image_01.png", "image_01_uni_15per.png", "image_01", "image_01_uni_15per")
-    # impulso_biipolar("images/image_02.png", 0.1, 0.5, "image_02_bip_10per.png")
-    # hist.carrega("images/image_02.png", "image_02_bip_10per.png", "image_02", "image_02_bip_10per")
-
-    # gaussian_noise("images/image_03.png", 15, 10, 'image_03_gaussianNoise.png')
-    # hist.carrega("images/image_03.png", "image_03_gaussianNoise.png", "image_03", "image_03_gaussianNoise")
-    # filtro("images/image_04.png", fMediana, 1, "image_04_mediana1.png")
-    # hist.carrega("images/image_04.png", "image_04_mediana1.png", "image_04", "image_04_mediana x1")
-
-    # filtroMedianaAdaptativo("images/image_04.png", 3, 7, "image_04_medianaAdaptativo.png")
-    # hist.carrega("images/image_04.png", "image_04_medianaAdaptativo.png", "image_04", "image_04_medianaAdaptativo")
-
-    # imagem05("images/image_05.png", 'image_05_fourier.png')
-
+    #---------------------------------------------------
+    #----------------Imagem 01 -------------------------
+    #---------------------------------------------------
+    impulso_unipolar("images/image_01.png", 0.15, 0, "image_01_uni_15per.png")
+    hist.carrega("images/image_01.png", "image_01_uni_15per.png", "image_01", "image_01_uni_15per")
     
-    # image4 = np.array(pil.open("images/image_04.png"))
-    # image4_x1 = np.array(pil.open("image_04_mediana1.png"))
-    # image4_x2 = np.array(pil.open("image_04_mediana2.png"))
-    # image4_x3 = np.array(pil.open("image_04_mediana2.png"))
-    
-   
-    # hist.histograma([image4 - image4_x1], 1, ["Ruido - image_04_gaussx1"], "Ruido - image_04_gaussx1")
-    # hist.histograma([image4 - image4_x2], 1, ["Ruido - image_04_gaussx2"], "Ruido - image_04_gaussx2")
-    # hist.histograma([image4 - image4_x3], 1, ["Ruido - image_04_gaussx3"], "Ruido - image_04_gaussx3")
-    
-    # statistic_filter("images/image_05.png", 3, mediaHarmonica, 'image05_mediaharmonica_3x3.png')
-    # statistic_filter("images/image_05.png", 5, mediaHarmonica, 'image05_mediaharmonica_5x5.png')
-    # statistic_filter("images/image_05.png", 7, mediaHarmonica, 'image05_mediaharmonica_7x7.png')
+    #---------------------------------------------------
+    #----------------Imagem 02 -------------------------
+    #---------------------------------------------------
+    impulso_biipolar("images/image_02.png", 0.1, 0.5, "image_02_bip_10per.png")
+    hist.carrega("images/image_02.png", "image_02_bip_10per.png", "image_02", "image_02_bip_10per")
 
+    #---------------------------------------------------
+    #----------------Imagem 03 -------------------------
+    #---------------------------------------------------
+    gaussian_noise("images/image_03.png", 15, 10, 'image_03_gaussianNoise.png')
+    hist.carrega("images/image_03.png", "image_03_gaussianNoise.png", "image_03", "image_03_gaussianNoise")
+    
+    #---------------------------------------------------
+    #----------------Imagem 04 -------------------------
+    #---------------------------------------------------
+    filtro("images/image_04.png", fMediana, 1, "image_04_mediana1.png")
+    hist.carrega("images/image_04.png", "image_04_mediana1.png", "image_04", "image_04_mediana x1")
+
+    filtroMedianaAdaptativo("images/image_04.png", 3, 7, "image_04_medianaAdaptativo.png")
+    hist.carrega("images/image_04.png", "image_04_medianaAdaptativo.png", "image_04", "image_04_medianaAdaptativo")
+
+    image4 = np.array(pil.open("images/image_04.png"))
+    image4_x1 = np.array(pil.open("image_04_mediana1.png"))
+    image4_x2 = np.array(pil.open("image_04_mediana2.png"))
+    image4_x3 = np.array(pil.open("image_04_mediana2.png"))
+    
+    hist.histograma([image4 - image4_x1], 1, ["Ruido - image_04_gaussx1"], "Ruido - image_04_gaussx1")
+    hist.histograma([image4 - image4_x2], 1, ["Ruido - image_04_gaussx2"], "Ruido - image_04_gaussx2")
+    hist.histograma([image4 - image4_x3], 1, ["Ruido - image_04_gaussx3"], "Ruido - image_04_gaussx3")
+    
+    #---------------------------------------------------
+    #----------------Imagem 05 -------------------------
+    #---------------------------------------------------
+    imagem05("images/image_05.png", 'image_05_fourier.png')
+    
+    #*********Filtro Gaussiano**********
+    filtro2(path="images/image_05.png", function=fGauss, media=0, desvio=10, dim=9, repeticoes=1, nome="image_05_gauss9x9.png")
+    filtro2(path="images/image_05.png", function=fGauss, media=0, desvio=10, dim=7, repeticoes=1, nome="image_05_gauss7x7.png")
+    filtro2(path="images/image_05.png", function=fGauss, media=0, desvio=10, dim=5, repeticoes=1, nome="image_05_gauss5x5.png")
+    filtro2(path="images/image_05.png", function=fGauss, media=0, desvio=10, dim=3, repeticoes=1, nome="image_05_gauss3x3.png")
+    
+    hist.carrega("images/image_05.png", "image_05_gauss9x9.png", "image_05", "image_05_gauss9x9.png")
+    hist.carrega("images/image_05.png", "image_05_gauss7x7.png", "image_05", "image_05_gauss7x7.png")
+    hist.carrega("images/image_05.png", "image_05_gauss5x5.png", "image_05", "image_05_gauss5x5.png")
+    hist.carrega("images/image_05.png", "image_05_gauss3x3.png", "image_05", "image_05_gauss3x3.png")
+    
+    image5 = np.array(pil.open("images/image_05.png"))
+    image5_9x9 = np.array(pil.open("image_05_gauss9x9.png"))
+    image5_7x7 = np.array(pil.open("image_05_gauss7x7.png"))
+    image5_5x5 = np.array(pil.open("image_05_gauss5x5.png"))
+    image5_3x3 = np.array(pil.open("image_05_gauss3x3.png"))
+    
+    hist.histograma([image5 - image5_9x9], 1, ["Ruido - image_05_gauss9x9"], "Ruido - image_05_gauss9x9")
+    hist.histograma([image5 - image5_7x7], 1, ["Ruido - image_05_gauss7x7"], "Ruido - image_05_gauss7x7")
+    hist.histograma([image5 - image5_5x5], 1, ["Ruido - image_05_gauss5x5"], "Ruido - image_05_gauss5x5")
+    hist.histograma([image5 - image5_3x3], 1, ["Ruido - image_05_gauss3x3"], "Ruido - image_05_gauss3x3")
+
+    #*********Filtro Média Harmônica**********
+    statistic_filter("images/image_05.png", 3, mediaHarmonica, 'image05_mediaharmonica_3x3.png')
+    statistic_filter("images/image_05.png", 5, mediaHarmonica, 'image05_mediaharmonica_5x5.png')
+    statistic_filter("images/image_05.png", 7, mediaHarmonica, 'image05_mediaharmonica_7x7.png')
+
+    hist.carrega("images/image_05.png", "image05_mediaharmonica_3x3.png", "image_05", "image05_mediaharmonica_3x3")
+    hist.carrega("images/image_05.png", "image05_mediaharmonica_5x5.png", "image_05", "image05_mediaharmonica_5x5")
+    hist.carrega("images/image_05.png", "image05_mediaharmonica_7x7.png", "image_05", "image05_mediaharmonica_7x7")
+
+    image05_mediaharmonica_3x3 = np.array(pil.open("image05_mediaharmonica_3x3.png"))
+    image05_mediaharmonica_5x5 = np.array(pil.open("image05_mediaharmonica_5x5.png"))
+    image05_mediaharmonica_7x7 = np.array(pil.open("image05_mediaharmonica_7x7.png"))
+    
+    hist.histograma([image5 - image05_mediaharmonica_3x3], 1, ["Ruido - image05_mediaharmonica_3x3"], "Ruido - image05_mediaharmonica_3x3")
+    hist.histograma([image5 - image05_mediaharmonica_5x5], 1, ["Ruido - image05_mediaharmonica_5x5"], "Ruido - image05_mediaharmonica_5x5")
+    hist.histograma([image5 - image05_mediaharmonica_7x7], 1, ["Ruido - image05_mediaharmonica_7x7"], "Ruido - image05_mediaharmonica_7x7")
+
+    #*********Filtro Adaptativo**********
     adaptative_filter("images/image_05.png", 3, 100, 'image05_adaptative_3x3.png')
     adaptative_filter("images/image_05.png", 5, 100, 'image05_adaptative_5x5.png')
     adaptative_filter("images/image_05.png", 7, 100, 'image05_adaptative_7x7.png')
 
-    # filtro2(path="images/image_05.png", function=fGauss, media=0, desvio=10, dim=9, repeticoes=1, nome="image_05_gauss9x9.png")
-    # filtro2(path="images/image_05.png", function=fGauss, media=0, desvio=10, dim=7, repeticoes=1, nome="image_05_gauss7x7.png")
-    # filtro2(path="images/image_05.png", function=fGauss, media=0, desvio=10, dim=5, repeticoes=1, nome="image_05_gauss5x5.png")
-    # filtro2(path="images/image_05.png", function=fGauss, media=0, desvio=10, dim=3, repeticoes=1, nome="image_05_gauss3x3.png")
-    
-    # hist.carrega("images/image_05.png", "image_05_gauss9x9.png", "image_05", "image_05_gauss9x9.png")
-    # hist.carrega("images/image_05.png", "image_05_gauss7x7.png", "image_05", "image_05_gauss7x7.png")
-    # hist.carrega("images/image_05.png", "image_05_gauss5x5.png", "image_05", "image_05_gauss5x5.png")
-    # hist.carrega("images/image_05.png", "image_05_gauss3x3.png", "image_05", "image_05_gauss3x3.png")
-    
-    # image5 = np.array(pil.open("images/image_05.png"))
-    # image5_9x9 = np.array(pil.open("image_05_gauss9x9.png"))
-    # image5_7x7 = np.array(pil.open("image_05_gauss7x7.png"))
-    # image5_5x5 = np.array(pil.open("image_05_gauss5x5.png"))
-    # image5_3x3 = np.array(pil.open("image_05_gauss3x3.png"))
-    
-    # hist.histograma([image5 - image5_9x9], 1, ["Ruido - image_05_gauss9x9"], "Ruido - image_05_gauss9x9")
-    # hist.histograma([image5 - image5_7x7], 1, ["Ruido - image_05_gauss7x7"], "Ruido - image_05_gauss7x7")
-    # hist.histograma([image5 - image5_5x5], 1, ["Ruido - image_05_gauss5x5"], "Ruido - image_05_gauss5x5")
-    # hist.histograma([image5 - image5_3x3], 1, ["Ruido - image_05_gauss3x3"], "Ruido - image_05_gauss3x3")
-      
-    # realceGama("image_05_gauss3x3.png", 140, 0.62, "image_05_gauss3x3")
-    # realceHistEq("image_05_gauss3x3.png", 255, "image_05_gauss3x3")
+    hist.carrega("images/image_05.png", "image05_adaptative_3x3.png", "image_05", "image05_adaptative_3x3")
+    hist.carrega("images/image_05.png", "image05_adaptative_5x5.png", "image_05", "image05_adaptative_5x5")
+    hist.carrega("images/image_05.png", "image05_adaptative_7x7.png", "image_05", "image05_adaptative_7x7")
+
+    image05_adaptative_3x3 = np.array(pil.open("image05_adaptative_3x3.png"))
+    image05_adaptative_5x5 = np.array(pil.open("image05_adaptative_5x5.png"))
+    image05_adaptative_7x7 = np.array(pil.open("image05_adaptative_7x7.png"))
+
+    hist.histograma([image5 - image05_adaptative_3x3], 1, ["Ruido - image05_adaptative_3x3"], "Ruido - image05_adaptative_3x3")
+    hist.histograma([image5 - image05_adaptative_5x5], 1, ["Ruido - image05_adaptative_5x5"], "Ruido - image05_adaptative_5x5")
+    hist.histograma([image5 - image05_adaptative_7x7], 1, ["Ruido - image05_adaptative_7x7"], "Ruido - image05_adaptative_7x7")
+
+          
+    realceGama("image_05_gauss3x3.png", 140, 0.62, "image_05_gauss3x3")
+    realceHistEq("image_05_gauss3x3.png", 255, "image_05_gauss3x3")
