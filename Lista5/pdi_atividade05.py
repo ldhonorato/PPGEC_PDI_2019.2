@@ -73,6 +73,22 @@ def fSobel2(imagem):
     
     return newImg
 
+def fLaplaciano(imagem):
+    img, origShape = padding(imagem)
+    newImg = np.zeros(origShape)
+    filtro = np.array([[-1, -1, -1],
+                       [-1, 8, -1],
+                       [-1, -1, -1]])/4
+      
+    for i  in range(img.shape[0] - 2):
+        for j in range(img.shape[1] - 2):
+            ni = i + 1
+            nj = j + 1
+            newImg[i, j] = np.sum((img[ni-1:ni+2,nj-1:nj+2])*filtro) #sub matriz
+    
+    return newImg
+
+
 def fMedia(imagem):
     img, origShape = padding(imagem, valor =100)
     newImg = np.zeros(origShape)
@@ -120,6 +136,29 @@ def fMediana(imagem):
     
     return newImg
 
+def fMax(imagem):
+    img, origShape = padding(imagem)
+    newImg = np.zeros(origShape)
+      
+    for i  in range(img.shape[0] - 2):
+        for j in range(img.shape[1] - 2):
+            ni = i + 1
+            nj = j + 1
+            newImg[i, j] = np.max(img[ni-1:ni+2,nj-1:nj+2]) #sub matriz
+    
+    return newImg
+
+def fMin(imagem):
+    img, origShape = padding(imagem)
+    newImg = np.zeros(origShape)
+      
+    for i  in range(img.shape[0] - 2):
+        for j in range(img.shape[1] - 2):
+            ni = i + 1
+            nj = j + 1
+            newImg[i, j] = np.min(img[ni-1:ni+2,nj-1:nj+2]) #sub matriz
+    
+    return newImg
 
 def filtro(path, function, repeticoes, nome, dim=None, desvio=None):
     img = pil.open(path)
@@ -293,10 +332,97 @@ def findConnectedPoints(imgBin):
                 id += 1
     return imgBinPad[1:imgBinPad.shape[0]-1, 1:imgBinPad.shape[1]-1]
 
+def gauss(subImg):
+        
+    g = np.array([[1, 2, 1],
+                  [2, 4, 2],
+                  [1, 2, 1]])/16
+
+    
+    pixel = np.sum(subImg*g)
+    
+    return pixel
+
+def fGauss(imagem):
+    img, origShape = padding(imagem, 1, 255)
+    newImg = np.zeros(origShape)
+          
+    for i  in range(img.shape[0] - 2):
+        for j in range(img.shape[1] - 2):
+            ni = i + 1
+            nj = j + 1
+            newImg[i, j] = gauss(img[ni-1:ni+2,nj-1:nj+2]) #sub matriz
+    
+    return newImg
+
+def otsu_aux(probCom, cont, itens, limiar):
+    limiar_index = (np.abs(np.array(itens) - limiar)).argmin()
     
 
+    itens_p1 = itens[:limiar_index]
+    itens_p2 = itens[limiar_index:]
+    
+    P1k = probCom[limiar_index]
+    P2k = 1 - P1k
+    
+    m1k = 0
+    m2k = 0
+    
+    for x in itens_p1:
+        m1k += x*cont[x]
+
+    for y in itens_p2:
+        m2k += x*cont[y]
+    
+    m1k /= P1k
+    m2k /= P2k
+    
+    mg = P1k*m1k + P2k*m2k
+    
+    variancia_g = 0
+    
+    for i in itens:
+        variancia_g = ((i - mg)**2) * cont[i]
+    
+    variancia_b = P1k*P1k*(m1k - m2k)**2
+    
+    return m1k, m2k, mg, P1k, P2k, variancia_g, variancia_b, limiar_index, itens_p1
+    
+def otsu(path, nome):
+    img = pil.open(path)
+    img = np.array(img)
+        
+    histograma = np.histogram(img, bins=256, range=(0, 255))[0]
+    histograma_prob = histograma/np.sum(histograma)
+    
+    K = -1
+    var_K = -1
+    
+    for entry in range(1, 255):
+        m1k = np.sum(np.arange(entry)*histograma_prob[:entry])/np.sum(histograma_prob[:entry])
+        m2k = np.sum(np.arange(entry, 256)*histograma_prob[entry:])/np.sum(histograma_prob[entry:])
+        
+        variancia = np.sum(histograma_prob[entry:]) * np.sum(histograma_prob[:entry]) * (m1k - m2k)**2
+        
+        if variancia > var_K:
+            var_K = variancia
+            K = entry
+    
+    print(K, var_K)
+        
+            
+    resultado = img > K
+    resultado = resultado.astype(np.int8)*255.
+    
+    pil.fromarray(resultado).convert("L").save(nome)
+            
+
 if __name__ == "__main__":
-    """
+    #===========================================================================
+    #===========================================================================
+    #**********************SEGMENTACAO IMAGEM 1*********************************
+    #===========================================================================
+    #===========================================================================
     a = filtro("images/image_1.png", fMH, 1, "image01_de4_dim5_fMH.png", dim=5, desvio=4)
     limiar_list = [-25,-35,-45,-55,-65,-75,-85,-95]
     for limiar in limiar_list:
@@ -342,6 +468,11 @@ if __name__ == "__main__":
         img = img.astype(np.int8)*255
         pil.fromarray(img).convert("L").save("image01_sobel_canny2_limiar_"+str(limiar)+".png")
     
+    #===========================================================================
+    #===========================================================================
+    #**********************SEGMENTACAO IMAGEM 2*********************************
+    #===========================================================================
+    #===========================================================================
     g = canny("images/image_2.png", 5, 0.2, "image02_sobel_canny.png")
     
     limiar_list = range(0, 250, 25)
@@ -349,8 +480,187 @@ if __name__ == "__main__":
         img = g > limiar
         img = img.astype(np.int8)*255
         pil.fromarray(img).convert("L").save("image02_sobel_canny_limiar_"+str(limiar)+".png")
-    """
+    
+    z = filtro("images/image_2.png", fMH, 1, "image02_fMH.png", dim=7, desvio=1)
+    limiar_list = range(0, 250, 25)
+    for limiar in limiar_list:
+        img = z[0] > limiar
+        img = img.astype(np.int8)*255
+        pil.fromarray(img).convert("L").save("image02_fMH_"+str(limiar)+".png")
+        
+    img1 = np.array(pil.open("image02_fMH_110_mediana4.png"))/255.
+    img2 = np.array(pil.open("images/image_2.png"))
+    pil.fromarray(img1*img2).convert("L").save("teste.png")
+    
+    f = canny("image2_fMH_limiar_mediana.png", 5, 0.5, "image2_fMH_limiar_mediana_canny.png")
+    
+    limiar_list = range(0, 250, 25)
+    for limiar in limiar_list:
+        img = f > limiar
+        img = img.astype(np.int8)*255
+        pil.fromarray(img).convert("L").save("image2_fMH_limiar_mediana_canny_"+str(limiar)+".png")
+
+    
+    b = filtro("image2_fMH_limiar_mediana.png", fSobel, 1, "image2_fMH_limiar_mediana_sobel.png")[0]
+    limiar_list = range(0, 250, 25)
+    for limiar in limiar_list:
+        img = b > limiar
+        img = img.astype(np.int8)*255
+        pil.fromarray(img).convert("L").save("image2_fMH_limiar_mediana_sobel"+str(limiar)+".png")
+    
+    #===========================================================================
+    #===========================================================================
+    #**********************SEGMENTACAO IMAGEM 4*********************************
+    #===========================================================================
+    #===========================================================================
+    b = filtro("images/image_4.png", fSobel, 1, "image4_sobel.png")[0]
+    limiar_list = range(0, 250, 25)
+    for limiar in limiar_list:
+        img = b > limiar
+        img = img.astype(np.int8)*255
+        pil.fromarray(img).convert("L").save("image2_fMH_limiar_mediana_sobel"+str(limiar)+".png")
+    
+    
+    c = filtro("images/image_4.png", fMedia, 1, "image_4M.png")[0]
+    otsu("image_4M.png", "image_4M_otsu.png")
+
+    otsu("image_4_gama.png", "image_4_gama_otsu.png")
+    
+    z = filtro("image_4_gama.png", fMH, 1, "image_4_gama_fMH.png", dim=7, desvio=1)
+    
+    z = np.array(pil.open("image_4_gama.png"))
+    limiar_list = range(0, 250, 10)
+    for limiar in limiar_list:
+        img = z < limiar
+        img = img.astype(np.int8)*255
+        pil.fromarray(img).convert("L").save("diego/image_4_gama_limiar_"+str(limiar)+".png")
+
+    g = filtro("image_4M.png", fLaplaciano, 1, "image4M_lapla.png")[0]
+    z = np.array(pil.open("image4M_lapla.png"))
+
+    z1 = np.array(pil.open("image_4M.png"))
+
+    pil.fromarray(z*z1).convert("L").save("image4M_prodlapla.png")
+    z2 = np.array(pil.open("image4M_prodlapla.png"))
+    
+    g = filtro("image4M_prodlapla_limiar_105.png", fMediana,1, "image4M_prodlapla_limiar_105Mediana.png")[0]
+    
+    e = np.array(pil.open("image4M_prodlapla.png"))
+    limiar_list = range(0, 250, 5)
+    for limiar in limiar_list:
+        img = e > limiar
+        img = img.astype(np.int8)*255
+        pil.fromarray(img).convert("L").save("image4/image4M_prodlapla_limiar_"+str(limiar)+".png")
+    
+    for i in range(z2.shape[0]):
+        for j in range(z2.shape[1]):
+            if z2[i, j] == 0:
+                z2[i, j] = 255
+    pil.fromarray(z2).convert("L").save("image4/image4_prodlapla_no0.png")
+    otsu("image4/image4_prodlapla_no0.png", "image4/image4_prodlapla_no0_otsu.png")
+
+    z2= np.array(pil.open("image_4.png"))
+    topLeft = z2[0:150,0:180]
+    pil.fromarray(topLeft).convert("L").save("image4TopLeft.png")
+    
+    for i in range(topLeft.shape[0]):
+        for j in range(topLeft.shape[1]):
+            if 155<topLeft[i, j]<178:
+                topLeft[i, j] = 125
+    
+    pil.fromarray(topLeft).convert("L").save("image4TopLeftRealceNL.png")
+    otsu("image4TopLeftRealceNL.png", "image4TopLeftRealceNL_otsu.png")
+    
+    #limiar_list = range(0, 250, 5)
+    #for limiar in limiar_list:
+    #    img = z2 > limiar
+    #    img = img.astype(np.int8)*255
+    #    pil.fromarray(img).convert("L").save("image4Bin/image4_limiar_"+str(limiar)+".png")
+    limiar = 105
+    z2 = z2 > limiar
+    z2 = z2.astype(np.int8)*255
+    pil.fromarray(z2).convert("L").save("image4_limiar_"+str(limiar)+".png")
+    
+    imgTLotsu = np.array(pil.open("image4TopLeftRealceNL_otsu.png"))
+    imgMask = z2
+    imgMask[0:150,0:180] = imgTLotsu
+    
+    pil.fromarray(imgMask).convert("L").save("image4Mask.png")
+    
+    imgMaskInvertida = imgMask < 100
+    imgMaskInvertida = imgMaskInvertida.astype(np.int8)*255
+    pil.fromarray(imgMaskInvertida).convert("L").save("imgMaskInvertida.png")
+    
+    imgOrig = np.array(pil.open("image_4.png"))
+    imgMaskInvertida = imgMaskInvertida/255.
+    seg = imgOrig.astype(np.int16) * imgMaskInvertida
+    
+    
+    
+    pil.fromarray(seg).convert("L").save("img4_segmentada.png")
+    
+    for i in range(seg.shape[0]):
+        for j in range(seg.shape[1]):
+            if seg[i, j] == 0:
+                seg[i, j] = 255
+    
+    pil.fromarray(seg).convert("L").save("img4_segmentadaFundoBranco.png")
+
+    #===========================================================================
+    #===========================================================================
+    #**********************SEGMENTACAO IMAGEM 5*********************************
+    #===========================================================================
+    #===========================================================================
+    
+    b = canny("images/image_5.png", 5, 0.5, "image05_sobel_canny.png")
+    limiar_list = range(0, 250, 25)
+    for limiar in limiar_list:
+        img = b > limiar
+        img = img.astype(np.int8)*255
+        pil.fromarray(img).convert("L").save("image5_sobel_canny"+str(limiar)+".png")
+    
+    #limiar image 5
+    e = np.array(pil.open("images/image_5.png"))
+    limiar_list = range(0, 250, 5)
+    for limiar in limiar_list:
+        img = e > limiar
+        img = img.astype(np.int8)*255
+        pil.fromarray(img).convert("L").save("image5/image5_limiar_"+str(limiar)+".png")  
+       
+    otsu("images/image_5.png", "image5/image5_otsu.png")
+    d = filtro("image5/image5_otsu.png", fGauss, 1, "image5/image5_otsu_gauss.png")[0]
+    g = filtro("image5/image5_otsu_gauss.png", fMin, 1, "image5/image5_otsu_gauss_min.png")[0]
+    g = filtro("image5/image5_otsu.png", fMin, 1, "image5/image5_otsu_min.png")[0]
+    
+    
+    g = filtro("image5/image5_otsu.png", fMin, 1, "image5/image5_otsu_min.png")[0]
+    
+        
+    #===========================================================================
+    #===========================================================================
+    #**********************SEGMENTACAO IMAGEM 6*********************************
+    #===========================================================================
+    #===========================================================================
     img = np.array(pil.open('images/image_6.png'))
+
+    #limiar image6
+    e = np.array(pil.open("images/image_6.png"))
+    limiar_list = range(0, 250, 5)
+    for limiar in limiar_list:
+        img = e > limiar
+        img = img.astype(np.int8)*255
+        pil.fromarray(img).convert("L").save("image5/image6_limiar_"+str(limiar)+".png")
+    #talvez
+
+    otsu("images/image_6.png", "image_6_otsu.png")
+    b = canny("image_6_otsu.png", 5, 0.5, "image_6_otsu_canny.png")
+    b = np.array(pil.open("image_6_otsu.png"))
+    limiar_list = range(0, 250, 25)
+    for limiar in limiar_list:
+        img = b > limiar
+        img = img.astype(np.int8)*255
+        pil.fromarray(img).convert("L").save("image_6_otsu_canny"+str(limiar)+".png")
+    
 
     limiar_list = range(0, 250, 25)
     for limiar in limiar_list:
