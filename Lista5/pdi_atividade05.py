@@ -10,7 +10,7 @@ import PIL.Image as pil
 import matplotlib.pyplot as plt
 import random
 import math
-from scipy import ndimage
+#from scipy import ndimage
 
 
 def padding(img, camadas=1, valor=255): #caso queira uma borda com valor diferente
@@ -672,10 +672,10 @@ if __name__ == "__main__":
     imgBin = imgBin/255
     plt.imshow(imgBin, cmap='gray')
     plt.show()
-    labeled, nr_objects = ndimage.label(imgBin)
+    #labeled, nr_objects = ndimage.label(imgBin)
     #labeled = findConnectedPoints2(imgBin)
-    #labeled = findConnectedPoints(imgBin)
-    print("Number of objects is {}".format(nr_objects))
+    labeled = findConnectedPoints(imgBin)
+    #print("Number of objects is {}".format(nr_objects))
 
     for i in range(labeled.shape[0]):
         for j in range(labeled.shape[1]):
